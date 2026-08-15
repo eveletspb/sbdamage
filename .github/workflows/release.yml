@@ -1,0 +1,43 @@
+name: Release addon
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify release version
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          toc_version="$(sed -n 's/^## Version: *//p' SbDamage.toc)"
+          test "$version" = "$toc_version" || {
+            echo "Tag version $version does not match addon version $toc_version"
+            exit 1
+          }
+
+      - name: Package
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          mkdir -p release/SbDamage
+          cp SbDamage.toc Core.lua CombatLog.lua Nameplates.lua Renderer.lua Options.lua README.md LICENSE release/SbDamage/
+          cp defaultwowfont.ttf font.ttf font2.ttf font3.ttf font4.ttf font5.ttf font6.ttf font7.ttf font8.ttf release/SbDamage/
+          cd release
+          zip -r "../SbDamage-v${version}.zip" SbDamage
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          gh release create "$GITHUB_REF_NAME" "SbDamage-v${version}.zip" \
+            --title "SbDamage ${version}" \
+            --generate-notes

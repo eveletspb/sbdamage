@@ -1,0 +1,13 @@
+## Interface: 30300
+## Title: SbDamage
+## Notes: Custom outgoing damage text with spell icons, pet damage and critical animations
+## Author: Sergey Bolshanin
+## Version: 1.6.8
+## DefaultState: Enabled
+## SavedVariables: SbDamageDB
+
+Core.lua
+CombatLog.lua
+Nameplates.lua
+Renderer.lua
+Options.lua
